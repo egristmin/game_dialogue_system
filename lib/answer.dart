@@ -9,6 +9,7 @@ class Answer {
     required this.content,
     this.stateCondition,
     this.event,
+    this.finishDialogue = false,
   });
 
   final AnswerId id;
@@ -16,6 +17,7 @@ class Answer {
   final String content;
   final Dialogue dialogue;
   final String? event;
+  final bool finishDialogue;
 
-  void choice() {}
+  void choice() => dialogue.onAnswerChoice(this);
 }
