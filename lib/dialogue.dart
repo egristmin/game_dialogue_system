@@ -1,19 +1,22 @@
 import 'package:game_dialogue_system/game_dialogue_system.dart';
 
 class Dialogue {
-  Dialogue({required this.config, this.onTriggerEvent, this.state}) {
+  Dialogue(
+      {required this.config,
+      required this.onUpdateAnswers,
+      this.onTriggerEvent,
+      this.state}) {
     _init();
   }
 
   final DialogueConfig config;
   final void Function(String)? onTriggerEvent;
+  final void Function(List<Answer>) onUpdateAnswers;
   Map<String, bool>? state;
   final Map<AnswerId, Answer> _answers = {};
   final Map<QuestionId, Question> _questions = {};
   late Question _currentQuestion;
-  late List<Answer> _currentPossibleAnswers;
-
-  List<Answer> get currentPossibleAnswers => _currentPossibleAnswers;
+  late List<Answer> _currentAnswers;
 
   void _init() {
     _fillDialogueMaps();
@@ -58,11 +61,12 @@ class Dialogue {
     if (_currentQuestion.children.isEmpty) {
       throw 'Empty question children. Question id: ${_currentQuestion.id}';
     }
-    _currentPossibleAnswers = _currentQuestion.children.values.map((answerId) {
+    _currentAnswers = _currentQuestion.children.values.map((answerId) {
       if (!_answers.containsKey(answerId)) {
         throw 'Possible answer not found. Answer id: $answerId';
       }
       return _answers[answerId]!;
     }).toList();
+    onUpdateAnswers(_currentAnswers);
   }
 }
