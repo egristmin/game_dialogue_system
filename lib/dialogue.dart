@@ -1,7 +1,18 @@
-import 'package:game_dialogue_system/typedef.dart';
+import 'package:game_dialogue_system/game_dialogue_system.dart';
 
 class Dialogue {
-  void onAnswerChoice(AnswerId answerId) {
+  Dialogue({this.triggerEvent});
 
+  late Question currentQuestion;
+
+  final void Function(String)? triggerEvent;
+
+  void onAnswerChoice(Answer answer) {
+    if (triggerEvent != null && answer.event != null) {
+      triggerEvent!(answer.event!);
+    }
+    if (!answer.finishDialogue) {
+      currentQuestion.getNextQuestionId(answer.id);
+    }
   }
 }
