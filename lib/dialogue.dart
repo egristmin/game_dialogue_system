@@ -31,8 +31,12 @@ class Dialogue {
   }
 
   void _defineIntro() {
-    final introQuestions =
-        _questions.values.where((question) => question.isIntro).toList();
+    final introQuestions = _questions.values
+        .where((question) => question.isIntro)
+        .where((question) =>
+            !question.hasStateCondition ||
+            state?[question.stateCondition] == true)
+        .toList();
     introQuestions.sort((a, b) => a.priority.compareTo(b.priority));
     _currentQuestion = introQuestions.last;
     _updateCurrentAnswers();
@@ -61,12 +65,16 @@ class Dialogue {
     if (_currentQuestion.children.isEmpty) {
       throw 'Empty question children. Question id: ${_currentQuestion.id}';
     }
-    _currentAnswers = _currentQuestion.children.values.map((answerId) {
-      if (!_answers.containsKey(answerId)) {
-        throw 'Possible answer not found. Answer id: $answerId';
-      }
-      return _answers[answerId]!;
-    }).toList();
+    _currentAnswers = _currentQuestion.children.values
+        .map((answerId) {
+          if (!_answers.containsKey(answerId)) {
+            throw 'Possible answer not found. Answer id: $answerId';
+          }
+          return _answers[answerId]!;
+        })
+        .where((answer) =>
+            !answer.hasStateCondition || state?[answer.stateCondition] == true)
+        .toList();
     onUpdateAnswers(_currentAnswers);
   }
 }

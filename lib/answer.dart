@@ -18,6 +18,8 @@ class Answer {
   final Dialogue dialogue;
   final String? event;
   final bool finishDialogue;
+  bool get hasStateCondition => stateCondition != null;
+
 
   void choice() => dialogue.onAnswerChoice(this);
 }
