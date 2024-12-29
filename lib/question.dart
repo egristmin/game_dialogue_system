@@ -10,6 +10,14 @@ class Question {
     required this.children,
   });
 
+  Question.fromJson(Map<String, dynamic> json)
+      : id = json['id'] as int,
+        isIntro = (json['isIntro'] as bool?) ?? false,
+        content = json['content'] as String,
+        priority = json['priority'] as int,
+        stateCondition = json['stateCondition'] as String?,
+        children = json['children'] as Map<int, int>;
+
   final QuestionId id;
   final bool isIntro;
   final String content;
@@ -25,4 +33,13 @@ class Question {
     }
     return children[answerId]!;
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'isIntro': isIntro,
+        'content': content,
+        'priority': priority,
+        if (stateCondition != null) 'stateCondition': stateCondition,
+        'children': children,
+      };
 }
