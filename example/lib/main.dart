@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'editor/editor.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -22,7 +24,6 @@ class MyApp extends StatelessWidget {
 
 class DialogueEditor extends StatefulWidget {
   const DialogueEditor({super.key});
-
 
   @override
   State<DialogueEditor> createState() => _DialogueEditorState();
@@ -51,20 +52,6 @@ class _DialogueEditorState extends State<DialogueEditor> {
         BottomNavigationBarItem(label: 'Example', icon: const Icon(Icons.home))
       ]),
     );
-  }
-}
-
-class Editor extends StatefulWidget {
-  const Editor({super.key});
-
-  @override
-  State<Editor> createState() => _EditorState();
-}
-
-class _EditorState extends State<Editor> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }
 
