@@ -3,9 +3,15 @@ import 'package:graphite/graphite.dart';
 
 class DialogueEditorNode extends NodeInput {
   DialogueEditorNode(
-      {this.answer, this.question, required super.id, required super.next});
+      {required this.type,
+      this.answer,
+      this.question,
+      required super.id,
+      required super.next});
 
-  Answer? answer;
-  Question? question;
+  final Answer? answer;
+  final Question? question;
+  final DialogueNodeType type;
 }
 
+enum DialogueNodeType { answer, question }

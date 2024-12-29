@@ -1,3 +1,4 @@
+import 'package:example/editor/update_node_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:graphite/graphite.dart';
 
@@ -31,18 +32,8 @@ class Editor extends StatefulWidget {
 
 class EditorState extends State<Editor> {
   final List<DialogueEditorNode> nodes = [
-    DialogueEditorNode(id: 'helloPlayer', next: [
-      EdgeInput(outcome: 'polite'),
-      EdgeInput(outcome: 'rude'),
-    ]),
-    DialogueEditorNode(id: 'polite', next: [
-      EdgeInput(outcome: 'happy'),
-    ]),
-    DialogueEditorNode(id: 'rude', next: [
-      EdgeInput(outcome: 'anger'),
-    ]),
-    DialogueEditorNode(id: 'anger', next: []),
-    DialogueEditorNode(id: 'happy', next: [])
+    DialogueEditorNode(
+        type: DialogueNodeType.answer, id: 'initialNode', next: []),
   ];
   bool _isVertical = false;
   bool _isCentered = true;
@@ -51,14 +42,15 @@ class EditorState extends State<Editor> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton:
-          FloatingActionButton(child: const Icon(Icons.add), onPressed: () {}),
+          FloatingActionButton(child: const Icon(Icons.add), onPressed: () {      showDialog(
+              context: context, builder: (context) => UpdateNodeDialog());}),
       body: Stack(
         children: [
           InteractiveViewer(
             constrained: false,
             child: DirectGraph(
               onNodeTapDown: (_, node, __) {
-                print(node.id);
+
               },
               list: nodes,
               defaultCellSize: const Size(100.0, 100.0),
