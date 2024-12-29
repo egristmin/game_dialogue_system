@@ -38,20 +38,32 @@ class EditorState extends State<Editor> {
   bool _isVertical = false;
   bool _isCentered = true;
 
+  Future<void> showUpdateDialog({DialogueEditorNode? initialNode}) async {
+    final DialogueEditorNode? nodeToUpdate = await showDialog(
+        context: context,
+        builder: (context) => UpdateNodeDialog(
+              initialNode: initialNode,
+              currentNodes: nodes,
+            ));
+    if (initialNode == null && nodeToUpdate != null) {
+      print('add node');
+      setState(() {
+        nodes.add(nodeToUpdate);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton:
-          FloatingActionButton(child: const Icon(Icons.add), onPressed: () {      showDialog(
-              context: context, builder: (context) => UpdateNodeDialog());}),
+      floatingActionButton: FloatingActionButton(
+          onPressed: showUpdateDialog, child: const Icon(Icons.add)),
       body: Stack(
         children: [
           InteractiveViewer(
             constrained: false,
             child: DirectGraph(
-              onNodeTapDown: (_, node, __) {
-
-              },
+              onNodeTapDown: (_, node, __) {},
               list: nodes,
               defaultCellSize: const Size(100.0, 100.0),
               cellPadding: _isVertical

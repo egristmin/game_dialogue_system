@@ -1,10 +1,13 @@
 import 'package:example/editor/dialogue_editor_node.dart';
 import 'package:flutter/material.dart';
+import 'package:graphite/core/typings.dart';
 
 class UpdateNodeDialog extends StatefulWidget {
-  const UpdateNodeDialog({this.initialNode, super.key});
+  const UpdateNodeDialog(
+      {this.initialNode, required this.currentNodes, super.key});
 
   final DialogueEditorNode? initialNode;
+  final List<DialogueEditorNode> currentNodes;
 
   @override
   State<UpdateNodeDialog> createState() => _UpdateNodeDialogState();
@@ -15,9 +18,35 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
   final Map<String, TextEditingController> controllers = {
     'content': TextEditingController(),
     'stateCondition': TextEditingController(),
-    'children': TextEditingController(),
     'eventOrPriority': TextEditingController(),
   };
+  final List<DialogueEditorNode> children = [];
+
+  void save() {
+    Navigator.pop(
+        context,
+        DialogueEditorNode(
+            //todo: add answer and question
+            type: isQuestion
+                ? DialogueNodeType.question
+                : DialogueNodeType.answer,
+            id: controllers['content']!.value.text,
+            next:
+                children.map((node) => EdgeInput(outcome: node.id)).toList()));
+  }
+
+  void addChildNode(DialogueEditorNode? node) {
+    if (node == null) return;
+    setState(() {
+      children.add(node);
+    });
+  }
+
+  void removeChild(DialogueEditorNode child) {
+    setState(() {
+      children.removeWhere((e) => e.id == child.id);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +59,7 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
           backgroundColor: Colors.blueGrey,
           body: SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 12,
               children: [
                 Row(
@@ -52,9 +82,23 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
                   controller: controllers['stateCondition'],
                   decoration: InputDecoration(labelText: 'State condition'),
                 ),
-                TextFormField(
-                  controller: controllers['children'],
-                  decoration: InputDecoration(labelText: 'Children'),
+                DropdownButton<DialogueEditorNode>(
+                    hint: Text('Children'),
+                    items: widget.currentNodes
+                        .map((node) => DropdownMenuItem<DialogueEditorNode>(
+                            value: node, child: (Text(node.id))))
+                        .toList(),
+                    onChanged: addChildNode),
+                Wrap(
+                  children: children
+                      .map((child) => Chip(
+                            label: Text(child.id),
+                            deleteIcon: Icon(Icons.delete),
+                            onDeleted: () {
+                              removeChild(child);
+                            },
+                          ))
+                      .toList(),
                 ),
                 TextFormField(
                   controller: controllers['eventOrPriority'],
@@ -68,9 +112,7 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context, null);
-                },
+                onPressed: save,
                 child: Text('Save'),
               ),
               ElevatedButton(
