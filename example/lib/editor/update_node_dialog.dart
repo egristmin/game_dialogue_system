@@ -7,7 +7,7 @@ class UpdateNodeDialog extends StatefulWidget {
       {this.initialNode, required this.currentNodes, super.key});
 
   final DialogueEditorNode? initialNode;
-  final List<DialogueEditorNode> currentNodes;
+  final Map<String, DialogueEditorNode> currentNodes;
 
   @override
   State<UpdateNodeDialog> createState() => _UpdateNodeDialogState();
@@ -21,12 +21,13 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
     'eventOrPriority': TextEditingController(),
   };
   final List<DialogueEditorNode> children = [];
+  DialogueEditorNode? parentNode;
 
   void save() {
     Navigator.pop(
         context,
         DialogueEditorNode(
-            //todo: add answer and question
+            parentNode: parentNode,
             type: isQuestion
                 ? DialogueNodeType.question
                 : DialogueNodeType.answer,
@@ -35,10 +36,35 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
                 children.map((node) => EdgeInput(outcome: node.id)).toList()));
   }
 
+  Map<int, int> fillQuestionChildren() {
+    final Map<int, int> output = {};
+    final answers = children.map((child) {
+      if (widget.currentNodes.containsKey(child.id)) {
+        return widget.currentNodes[child.id]!;
+      }
+    }).toList();
+    output.addEntries(answers.map((answerNode) {
+      return MapEntry(
+          answerNode!.answer!.id,
+          widget.currentNodes.values
+              .firstWhere((node) => answerNode.parentNode!.id == answerNode.id)
+              .question!
+              .id);
+    }));
+    return output;
+  }
+
   void addChildNode(DialogueEditorNode? node) {
     if (node == null) return;
     setState(() {
+      if (!isQuestion) children.clear();
       children.add(node);
+    });
+  }
+
+  void setParentNode(DialogueEditorNode? node) {
+    setState(() {
+      parentNode = node;
     });
   }
 
@@ -53,10 +79,10 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
     return Dialog(
       child: Container(
         decoration: BoxDecoration(
-            color: Colors.blueGrey, borderRadius: BorderRadius.circular(12)),
+            color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.all(12),
         child: Scaffold(
-          backgroundColor: Colors.blueGrey,
+          backgroundColor: Theme.of(context).cardColor,
           body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,17 +102,34 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
                 ),
                 TextFormField(
                   controller: controllers['content'],
-                  decoration: InputDecoration(labelText: 'Content'),
+                  decoration: InputDecoration(
+                    labelText: 'Content',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
                 TextFormField(
                   controller: controllers['stateCondition'],
-                  decoration: InputDecoration(labelText: 'State condition'),
+                  decoration: InputDecoration(
+                    labelText: 'State condition',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
                 DropdownButton<DialogueEditorNode>(
-                    hint: Text('Children'),
-                    items: widget.currentNodes
+                    hint: Text('Parent'),
+                    items: widget.currentNodes.values
                         .map((node) => DropdownMenuItem<DialogueEditorNode>(
                             value: node, child: (Text(node.id))))
+                        .toList(),
+                    onChanged: setParentNode),
+                DropdownButton<DialogueEditorNode>(
+                    hint: Text('Children'),
+                    items: widget.currentNodes.values
+                        .map(
+                          (node) => DropdownMenuItem<DialogueEditorNode>(
+                            value: node,
+                            child: (Text(node.id)),
+                          ),
+                        )
                         .toList(),
                     onChanged: addChildNode),
                 Wrap(
@@ -103,7 +146,9 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
                 TextFormField(
                   controller: controllers['eventOrPriority'],
                   decoration: InputDecoration(
-                      labelText: isQuestion ? 'Priority' : 'Event'),
+                    labelText: isQuestion ? 'Priority' : 'Event',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
               ],
             ),
@@ -136,9 +181,3 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
     super.dispose();
   }
 }
-//Answer
-// finishDialogue
-
-// Question
-
-// isIntro
