@@ -77,13 +77,13 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
                 Row(
                   spacing: 12,
                   children: [
-                    Text('Question'),
+                    Text('Answer'),
                     Switch(
                         value: isQuestion,
                         onChanged: (value) => setState(() {
                               isQuestion = value;
                             })),
-                    Text('Answer'),
+                    Text('Question'),
                   ],
                 ),
                 TextFormField(
