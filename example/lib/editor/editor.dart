@@ -1,3 +1,4 @@
+import 'package:example/editor/converter.dart';
 import 'package:example/editor/edge_label.dart';
 import 'package:example/editor/editor_node.dart';
 import 'package:example/editor/file_manager.dart';
@@ -15,10 +16,7 @@ class Editor extends StatefulWidget {
 }
 
 class EditorState extends State<Editor> {
-  final Map<String, DialogueEditorNode> nodes = {
-    'initialNode': DialogueEditorNode(
-        type: DialogueNodeType.answer, id: 'initialNode', next: []),
-  };
+  final Map<String, DialogueEditorNode> nodes = {};
 
   Future<void> showUpdateDialog({DialogueEditorNode? initialNode}) async {
     final DialogueEditorNode? nodeToUpdate = await showDialog(
@@ -45,11 +43,12 @@ class EditorState extends State<Editor> {
   }
 
   Future<String> getFileName() async {
-    return '';
+    return 'test';
   }
 
   Future<void> saveFile() async {
-    FileManager.saveJson(await assembleDialogueConfig(), await getFileName());
+    FileManager.saveJson(Converter(nodes: nodes).configFromNodes().toJson(),
+        await getFileName());
   }
 
   @override
@@ -67,23 +66,41 @@ class EditorState extends State<Editor> {
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: showUpdateDialog, child: const Icon(Icons.add)),
-      body: InteractiveViewer(
-        constrained: false,
-        child: DirectGraph(
-          onNodeTapDown: (_, node, __) {},
-          list: nodes.values.toList(),
-          defaultCellSize: const Size(100.0, 100.0),
-          cellPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
-          contactEdgesDistance: 10.0,
-          orientation: MatrixOrientation.Horizontal,
-          nodeBuilder: (context, node) => EditorNode(node: node),
-          edgeLabels: EdgeLabels(
-              alignment: EdgeLabelTextAlignment.before,
-              positionPriority: EdgeLabelPositionPriority.horizontal,
-              builder: (_, edge, isVertical) =>
-                  EditorEdgeLabel(edge: edge, isVertical: isVertical)),
-        ),
-      ),
+      body: nodes.isNotEmpty
+          ? InteractiveViewer(
+              constrained: false,
+              child: DirectGraph(
+                onNodeTapDown: (_, node, __) {},
+                list: nodes.values.toList(),
+                defaultCellSize: const Size(100.0, 100.0),
+                cellPadding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
+                contactEdgesDistance: 10.0,
+                orientation: MatrixOrientation.Horizontal,
+                nodeBuilder: (context, node) =>
+                    EditorNode(node: nodes[node.id]!),
+                styleBuilder: (_) => EdgeStyle(
+                    linePaint: Paint()
+                      ..color = Color(0xFFFFFFFF)
+                      ..style = PaintingStyle.stroke
+                      ..strokeCap = StrokeCap.round
+                      ..strokeJoin = StrokeJoin.round
+                      ..strokeWidth = 2),
+                edgeLabels: EdgeLabels(
+                    alignment: EdgeLabelTextAlignment.before,
+                    positionPriority: EdgeLabelPositionPriority.horizontal,
+                    builder: (_, edge, __) {
+                      if ((nodes[edge.to.id] as DialogueEditorNode)
+                              .stateCondition !=
+                          null) {
+                        return EditorEdgeLabel(
+                            condition: nodes[edge.to.id]!.stateCondition!);
+                      }
+                      return SizedBox();
+                    }),
+              ),
+            )
+          : Text('Add first node'),
     );
   }
 }

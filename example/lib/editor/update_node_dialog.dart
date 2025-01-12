@@ -27,31 +27,16 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
     Navigator.pop(
         context,
         DialogueEditorNode(
-            parentNode: parentNode,
-            type: isQuestion
-                ? DialogueNodeType.question
-                : DialogueNodeType.answer,
-            id: controllers['content']!.value.text,
-            next:
-                children.map((node) => EdgeInput(outcome: node.id)).toList()));
-  }
-
-  Map<int, int> fillQuestionChildren() {
-    final Map<int, int> output = {};
-    final answers = children.map((child) {
-      if (widget.currentNodes.containsKey(child.id)) {
-        return widget.currentNodes[child.id]!;
-      }
-    }).toList();
-    output.addEntries(answers.map((answerNode) {
-      return MapEntry(
-          answerNode!.answer!.id,
-          widget.currentNodes.values
-              .firstWhere((node) => answerNode.parentNode!.id == answerNode.id)
-              .question!
-              .id);
-    }));
-    return output;
+          parentNode: parentNode,
+          type:
+              isQuestion ? DialogueNodeType.question : DialogueNodeType.answer,
+          id: controllers['content']!.value.text,
+          next: children.map((node) => EdgeInput(outcome: node.id)).toList(),
+          stateCondition: controllers['stateCondition']!.value.text,
+          event: controllers['eventOrPriority']!.value.text,
+          priority:
+              int.tryParse(controllers['eventOrPriority']!.value.text) ?? 0,
+        ));
   }
 
   void addChildNode(DialogueEditorNode? node) {
@@ -79,7 +64,8 @@ class _UpdateNodeDialogState extends State<UpdateNodeDialog> {
     return Dialog(
       child: Container(
         decoration: BoxDecoration(
-            color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(12)),
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.all(12),
         child: Scaffold(
           backgroundColor: Theme.of(context).cardColor,

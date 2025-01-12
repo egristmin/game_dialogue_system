@@ -42,4 +42,22 @@ class Question {
         if (stateCondition != null) 'stateCondition': stateCondition,
         'children': children,
       };
+
+  Question copyWith({
+    QuestionId? id,
+    bool? isIntro,
+    String? content,
+    int? priority,
+    String? stateCondition,
+    Map<AnswerId, QuestionId>? children,
+  }) {
+    return Question(
+      id: id ?? this.id,
+      isIntro: isIntro ?? this.isIntro,
+      content: content ?? this.content,
+      priority: priority ?? this.priority,
+      stateCondition: stateCondition ?? this.stateCondition,
+      children: children ?? this.children,
+    );
+  }
 }

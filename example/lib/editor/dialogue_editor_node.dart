@@ -1,19 +1,20 @@
-import 'package:game_dialogue_system/game_dialogue_system.dart';
 import 'package:graphite/graphite.dart';
 
 class DialogueEditorNode extends NodeInput {
   DialogueEditorNode(
       {this.parentNode,
       required this.type,
-      this.answer,
-      this.question,
+      required this.stateCondition,
+      required this.event,
+      required this.priority,
       required super.id,
       required super.next});
 
   final DialogueEditorNode? parentNode;
-  final Answer? answer;
-  final Question? question;
   final DialogueNodeType type;
+  final int priority;
+  final String? stateCondition;
+  final String? event;
 }
 
 enum DialogueNodeType { answer, question }
