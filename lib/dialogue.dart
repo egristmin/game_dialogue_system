@@ -18,6 +18,10 @@ class Dialogue {
   late Question _currentQuestion;
   late List<Answer> _currentAnswers;
 
+  Question get currentQuestion => _currentQuestion;
+
+  List<Answer> get currentAnswers => _currentAnswers;
+
   void _init() {
     _fillDialogueMaps();
     _defineIntro();
