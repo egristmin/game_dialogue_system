@@ -69,7 +69,7 @@ class Dialogue {
     if (_currentQuestion.children.isEmpty) {
       throw 'Empty question children. Question id: ${_currentQuestion.id}';
     }
-    _currentAnswers = _currentQuestion.children.values
+    _currentAnswers = _currentQuestion.children.keys
         .map((answerId) {
           if (!_answers.containsKey(answerId)) {
             throw 'Possible answer not found. Answer id: $answerId';

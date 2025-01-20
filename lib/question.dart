@@ -1,5 +1,10 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'typedef.dart';
 
+part 'question.g.dart';
+
+@JsonSerializable()
 class Question {
   const Question({
     required this.id,
@@ -10,38 +15,26 @@ class Question {
     required this.children,
   });
 
-  Question.fromJson(Map<String, dynamic> json)
-      : id = json['id'] as int,
-        isIntro = (json['isIntro'] as bool?) ?? false,
-        content = json['content'] as String,
-        priority = json['priority'] as int,
-        stateCondition = json['stateCondition'] as String?,
-        children = json['children'] as Map<int, int>;
-
   final QuestionId id;
   final bool isIntro;
   final String content;
   final int priority;
   final String? stateCondition;
-  final Map<AnswerId, QuestionId> children;
+  final Map<QuestionId, QuestionId> children;
 
-  bool get hasStateCondition => stateCondition != null;
+  bool get hasStateCondition => stateCondition != null && stateCondition!.isNotEmpty;
 
-  QuestionId getNextQuestionId(AnswerId answerId) {
-    if (!children.containsKey(answerId)) {
-      throw 'Next question not found. Answer id: $answerId';
+  QuestionId getNextQuestionId(QuestionId QuestionId) {
+    if (!children.containsKey(QuestionId)) {
+      throw 'Next question not found. Question id: $QuestionId';
     }
-    return children[answerId]!;
+    return children[QuestionId]!;
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'isIntro': isIntro,
-        'content': content,
-        'priority': priority,
-        if (stateCondition != null) 'stateCondition': stateCondition,
-        'children': children,
-      };
+  factory Question.fromJson(Map<String, dynamic> json) =>
+      _$QuestionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$QuestionToJson(this);
 
   Question copyWith({
     QuestionId? id,
@@ -49,7 +42,7 @@ class Question {
     String? content,
     int? priority,
     String? stateCondition,
-    Map<AnswerId, QuestionId>? children,
+    Map<QuestionId, QuestionId>? children,
   }) {
     return Question(
       id: id ?? this.id,

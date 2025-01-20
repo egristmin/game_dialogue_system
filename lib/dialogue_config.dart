@@ -1,21 +1,17 @@
 import 'package:game_dialogue_system/game_dialogue_system.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'dialogue_config.g.dart';
+
+@JsonSerializable()
 class DialogueConfig {
   final List<Answer> answers;
   final List<Question> questions;
 
   const DialogueConfig({this.questions = const [], this.answers = const []});
 
-  DialogueConfig.fromJson(Map<String, dynamic> json)
-      : answers = ((json['answers'] ?? []) as List<Map<String, dynamic>>)
-            .map((Answer.fromJson))
-            .toList(),
-        questions = ((json['questions'] ?? []) as List<Map<String, dynamic>>)
-            .map((Question.fromJson))
-            .toList();
+  factory DialogueConfig.fromJson(Map<String, dynamic> json) =>
+      _$DialogueConfigFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'answers': answers.map((answer) => answer.toJson()).toList(),
-        'questions': questions.map((question) => question.toJson()).toList(),
-      };
+  Map<String, dynamic> toJson() => _$DialogueConfigToJson(this);
 }
